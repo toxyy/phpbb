@@ -206,33 +206,22 @@ function send_file_to_browser($attachment, $category)
 		header('X-Content-Type-Options: nosniff');
 	}
 
-	if ($category == ATTACHMENT_CATEGORY_FLASH && $request->variable('view', 0) === 1)
+	if (empty($user->browser) || ((strpos(strtolower($user->browser), 'msie') !== false) && !phpbb_is_greater_ie_version($user->browser, 7)))
 	{
-		// We use content-disposition: inline for flash files and view=1 to let it correctly play with flash player 10 - any other disposition will fail to play inline
-		header('Content-Disposition: inline');
+		header('Content-Disposition: attachment; ' . header_filename(htmlspecialchars_decode($attachment['real_filename'])));
+		if (empty($user->browser) || (strpos(strtolower($user->browser), 'msie 6.0') !== false))
+		{
+			header('Expires: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
+		}
 	}
 	else
 	{
-		if (empty($user->browser) || ((strpos(strtolower($user->browser), 'msie') !== false) && !phpbb_is_greater_ie_version($user->browser, 7)))
+		header('Content-Disposition: ' . ((strpos($attachment['mimetype'], 'image') === 0) ? 'inline' : 'attachment') . '; ' . header_filename(htmlspecialchars_decode($attachment['real_filename'])));
+		if (phpbb_is_greater_ie_version($user->browser, 7) && (strpos($attachment['mimetype'], 'image') !== 0))
 		{
-			header('Content-Disposition: attachment; ' . header_filename(htmlspecialchars_decode($attachment['real_filename'])));
-			if (empty($user->browser) || (strpos(strtolower($user->browser), 'msie 6.0') !== false))
-			{
-				header('Expires: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
-			}
-		}
-		else
-		{
-			header('Content-Disposition: ' . ((strpos($attachment['mimetype'], 'image') === 0) ? 'inline' : 'attachment') . '; ' . header_filename(htmlspecialchars_decode($attachment['real_filename'])));
-			if (phpbb_is_greater_ie_version($user->browser, 7) && (strpos($attachment['mimetype'], 'image') !== 0))
-			{
-				header('X-Download-Options: noopen');
-			}
+			header('X-Download-Options: noopen');
 		}
 	}
-
-	// Close the db connection before sending the file etc.
-	file_gc(false);
 
 	if (!set_modified_headers($attachment['filetime'], $user->browser))
 	{
@@ -245,6 +234,9 @@ function send_file_to_browser($attachment, $category)
 		@set_time_limit(0);
 
 		$fp = $storage->read_stream($filename);
+
+		// Close the db connection before sending the file etc.
+		file_gc(false);
 
 		if ($fp !== false)
 		{

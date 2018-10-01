@@ -11,38 +11,27 @@
 *
 */
 
-namespace phpbb\db\migration\data\v320;
+namespace phpbb\db\migration\data\v330;
 
-class remove_outdated_media extends \phpbb\db\migration\migration
+class remove_attachment_flash extends \phpbb\db\migration\migration
 {
-	// Following constants were deprecated in 3.2
+	// Following constants were deprecated in 3.3
 	// and moved from constants.php to compatibility_globals.php,
 	// thus define them as class constants
-	const ATTACHMENT_CATEGORY_WM = 2;
-	const ATTACHMENT_CATEGORY_RM = 3;
-	const ATTACHMENT_CATEGORY_QUICKTIME = 6;
+	const ATTACHMENT_CATEGORY_FLASH = 5;
 
 	protected $cat_id = array(
-			self::ATTACHMENT_CATEGORY_WM,
-			self::ATTACHMENT_CATEGORY_RM,
-			self::ATTACHMENT_CATEGORY_QUICKTIME,
+			self::ATTACHMENT_CATEGORY_FLASH,
 		);
-
-	static public function depends_on()
-	{
-		return array(
-			'\phpbb\db\migration\data\v320\dev',
-		);
-	}
 
 	public function update_data()
 	{
 		return array(
-			array('custom', array(array($this, 'change_extension_group'))),
+			array('custom', array(array($this, 'remove_flash_group'))),
 		);
 	}
 
-	public function change_extension_group()
+	public function remove_flash_group()
 	{
 		// select group ids of outdated media
 		$sql = 'SELECT group_id
