@@ -289,13 +289,13 @@ INSERT INTO phpbb_config (config_name, config_value) VALUES ('exts_composer_enab
 INSERT INTO phpbb_config (config_name, config_value) VALUES ('exts_composer_purge_on_remove', '1');
 INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\attachment\provider', 'phpbb\storage\provider\local');
 INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\attachment\config\path', 'files');
-INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\attachment\config\subfolders', '0');
+INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\attachment\config\depth', '0');
 INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\avatar\provider', 'phpbb\storage\provider\local');
 INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\avatar\config\path', 'images/avatars/upload');
-INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\avatar\config\subfolders', '0');
+INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\avatar\config\depth', '0');
 INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\backup\provider', 'phpbb\storage\provider\local');
 INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\backup\config\path', 'store');
-INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\backup\config\subfolders', '0');
+INSERT INTO phpbb_config (config_name, config_value) VALUES ('storage\backup\config\depth', '0');
 
 INSERT INTO phpbb_config (config_name, config_value, is_dynamic) VALUES ('cache_last_gc', '0', 1);
 INSERT INTO phpbb_config (config_name, config_value, is_dynamic) VALUES ('cron_lock', '0', 1);
@@ -739,6 +739,7 @@ INSERT INTO phpbb_extension_groups (group_name, cat_id, allow_group, upload_icon
 INSERT INTO phpbb_extension_groups (group_name, cat_id, allow_group, upload_icon, max_filesize, allowed_forums) VALUES ('ARCHIVES', 0, 1, '', 0, '');
 INSERT INTO phpbb_extension_groups (group_name, cat_id, allow_group, upload_icon, max_filesize, allowed_forums) VALUES ('PLAIN_TEXT', 0, 0, '', 0, '');
 INSERT INTO phpbb_extension_groups (group_name, cat_id, allow_group, upload_icon, max_filesize, allowed_forums) VALUES ('DOCUMENTS', 0, 0, '', 0, '');
+INSERT INTO phpbb_extension_groups (group_name, cat_id, allow_group, upload_icon, max_filesize, allowed_forums) VALUES ('FLASH_FILES', 5, 0, '', 0, '');
 INSERT INTO phpbb_extension_groups (group_name, cat_id, allow_group, upload_icon, max_filesize, allowed_forums) VALUES ('DOWNLOADABLE_FILES', 0, 0, '', 0, '');
 
 # -- extensions
@@ -794,6 +795,8 @@ INSERT INTO phpbb_extensions (group_id, extension) VALUES (4, 'odp');
 INSERT INTO phpbb_extensions (group_id, extension) VALUES (4, 'ods');
 INSERT INTO phpbb_extensions (group_id, extension) VALUES (4, 'odt');
 INSERT INTO phpbb_extensions (group_id, extension) VALUES (4, 'rtf');
+
+INSERT INTO phpbb_extensions (group_id, extension) VALUES (5, 'swf');
 
 INSERT INTO phpbb_extensions (group_id, extension) VALUES (6, 'mp3');
 INSERT INTO phpbb_extensions (group_id, extension) VALUES (6, 'mpeg');

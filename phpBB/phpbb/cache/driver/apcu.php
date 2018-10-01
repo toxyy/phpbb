@@ -25,11 +25,7 @@ class apcu extends \phpbb\cache\driver\memory
 	*/
 	function purge()
 	{
-		/*
-		* Use an iterator to selectively delete our cache entries without disturbing
-		* any other cache users (e.g. other phpBB boards hosted on this server)
-		*/
-		apcu_delete(new \APCUIterator('#^' . $this->key_prefix . '#'));
+		apcu_clear_cache();
 
 		parent::purge();
 	}

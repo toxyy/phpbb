@@ -37,14 +37,8 @@ class local implements provider_interface
 	public function get_options()
 	{
 		return [
-			'path' => ['type' => 'text'],
-			'subfolders' => [
-				'type' => 'radio',
-				'options' => [
-					'ENABLE' => '1',
-					'DISABLE' => '0',
-				],
-			],
+			'path' => array('type' => 'text'),
+			'depth' => array('type' => 'text'),
 		];
 	}
 

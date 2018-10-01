@@ -199,7 +199,6 @@ class upload
 		// Check for attachment quota and free space
 		if (!$this->check_attach_quota() || !$this->check_disk_space())
 		{
-			$this->file->remove($this->storage);
 			return $this->file_data;
 		}
 
@@ -247,13 +246,8 @@ class upload
 			{
 				// Move the thumbnail from temp folder to the storage
 				$fp = fopen($destination, 'rb');
-
 				$this->storage->write_stream($destination_name, $fp);
-
-				if (is_resource($fp))
-				{
-					fclose($fp);
-				}
+				fclose($fp);
 			}
 			else
 			{
@@ -320,6 +314,8 @@ class upload
 				$this->file_data['error'][] = $this->language->lang('ATTACH_QUOTA_REACHED');
 				$this->file_data['post_attach'] = false;
 
+				$this->file->remove($this->storage);
+
 				return false;
 			}
 		}
@@ -330,35 +326,10 @@ class upload
 	/**
 	 * Check if there is enough free space available on disk
 	 *
-	 * @return bool True if disk space is available or not limited, false if not
+	 * @return bool True if disk space is available, false if not
 	 */
 	protected function check_disk_space()
 	{
-		try
-		{
-			$free_space = $this->storage->free_space();
-
-			if ($free_space <= $this->file->get('filesize'))
-			{
-				if ($this->auth->acl_get('a_'))
-				{
-					$this->file_data['error'][] = $this->language->lang('ATTACH_DISK_FULL');
-				}
-				else
-				{
-					$this->file_data['error'][] = $this->language->lang('ATTACH_QUOTA_REACHED');
-				}
-
-				$this->file_data['post_attach'] = false;
-
-				return false;
-			}
-		}
-		catch (\phpbb\storage\exception\exception $e)
-		{
-			// Do nothing
-		}
-
 		return true;
 	}
 

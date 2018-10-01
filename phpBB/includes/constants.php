@@ -167,6 +167,7 @@ define('CONFIRM_REPORT', 4);
 define('ATTACHMENT_CATEGORY_NONE', 0);
 define('ATTACHMENT_CATEGORY_IMAGE', 1); // Inline Images
 define('ATTACHMENT_CATEGORY_THUMB', 4); // Not used within the database, only while displaying posts
+define('ATTACHMENT_CATEGORY_FLASH', 5); // Flash/SWF files
 
 // BBCode UID length
 define('BBCODE_UID_LEN', 8);
@@ -287,7 +288,6 @@ define('SESSIONS_KEYS_TABLE',		$table_prefix . 'sessions_keys');
 define('SITELIST_TABLE',			$table_prefix . 'sitelist');
 define('SMILIES_TABLE',				$table_prefix . 'smilies');
 define('SPHINX_TABLE',				$table_prefix . 'sphinx');
-define('STORAGE_TABLE',				$table_prefix . 'storage');
 define('STYLES_TABLE',				$table_prefix . 'styles');
 define('STYLES_TEMPLATE_TABLE',		$table_prefix . 'styles_template');
 define('STYLES_TEMPLATE_DATA_TABLE',$table_prefix . 'styles_template_data');

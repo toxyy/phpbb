@@ -36,17 +36,17 @@ $mode	= $request->variable('mode', '');
 
 if ($forum_id !== 0)
 {
-	$url = $controller_helper->route('phpbb_feed_forum', array('forum_id' => $forum_id), false);
+	$url = $controller_helper->route('phpbb_feed_forum', array('forum_id' => $forum_id));
 }
 else if ($topic_id !== 0)
 {
-	$url = $controller_helper->route('phpbb_feed_topic', array('topic_id' => $topic_id), false);
+	$url = $controller_helper->route('phpbb_feed_topic', array('topic_id' => $topic_id));
 }
 else
 {
 	try
 	{
-		$url = $controller_helper->route('phpbb_feed_overall', array('mode' => $mode), false);
+		$url = $controller_helper->route('phpbb_feed_overall', array('mode' => $mode));
 	}
 	catch (InvalidParameterException $e)
 	{

@@ -35,7 +35,14 @@ class phpbb_avatar_manager_test extends \phpbb_database_test_case
 			->method('get')
 			->will($this->returnArgument(0));
 
-		$storage = $this->createMock('\phpbb\storage\storage');
+		$filesystem = new \phpbb\filesystem\filesystem();
+		$adapter = new \phpbb\storage\adapter\local($filesystem, new \FastImageSize\FastImageSize(), new \phpbb\mimetype\guesser(array(new \phpbb\mimetype\extension_guesser)), $phpbb_root_path);
+		$adapter->configure(['path' => 'images/avatars/upload']);
+		$adapter_factory_mock = $this->createMock('\phpbb\storage\adapter_factory');
+		$adapter_factory_mock->expects($this->any())
+			->method('get')
+			->willReturn($adapter);
+		$storage = new \phpbb\storage\storage($adapter_factory_mock, '');
 
 		// Prepare dependencies for avatar manager and driver
 		$this->config = new \phpbb\config\config(array());

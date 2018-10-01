@@ -92,7 +92,13 @@ abstract class phpbb_notification_submit_post_base extends phpbb_database_test_c
 		$lang = new \phpbb\language\language(new \phpbb\language\language_file_loader($phpbb_root_path, $phpEx));
 
 		// Storage
-		$storage = $this->createMock('\phpbb\storage\storage');
+		$adapter = new \phpbb\storage\adapter\local(new \phpbb\filesystem\filesystem(), new \FastImageSize\FastImageSize(), new \phpbb\mimetype\guesser(array(new \phpbb\mimetype\extension_guesser)), $phpbb_root_path);
+		$adapter->configure(['path' => 'files']);
+		$adapter_factory_mock = $this->createMock('\phpbb\storage\adapter_factory');
+		$adapter_factory_mock->expects($this->any())
+			->method('get')
+			->willReturn($adapter);
+		$storage = new \phpbb\storage\storage($adapter_factory_mock, '');
 
 		// User
 		$user = $this->createMock('\phpbb\user', array(), array(

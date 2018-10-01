@@ -267,7 +267,7 @@ class mssqlnative extends \phpbb\db\driver\mssql_base
 				unset($row['line2'], $row['line3']);
 			}
 		}
-		return ($row !== null) ? $row : false;
+		return (count($row)) ? $row : false;
 	}
 
 	/**

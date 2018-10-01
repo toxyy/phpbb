@@ -73,17 +73,10 @@ class local implements adapter_interface, stream_interface
 	 * This is for those who have problems storing a large number of files in
 	 * a single directory.
 	 * More info: https://tracker.phpbb.com/browse/PHPBB3-15371
-	 */
-
-	/*
-	 * @var bool subfolders
-	 */
-	protected $subfolders;
-
-	/*
+	 *
 	 * @var int dir_depth
 	 */
-	protected $dir_depth = 2;
+	protected $dir_depth;
 
 	/**
 	 * Constructor
@@ -108,7 +101,7 @@ class local implements adapter_interface, stream_interface
 
 		$this->path = $options['path'];
 		$this->root_path = $this->phpbb_root_path . $options['path'];
-		$this->subfolders = (bool) $options['subfolders'];
+		$this->dir_depth = (int) $options['depth'];
 	}
 
 	/**
@@ -117,6 +110,11 @@ class local implements adapter_interface, stream_interface
 	public function put_contents($path, $content)
 	{
 		$this->ensure_directory_exists($path);
+
+		if ($this->exists($path))
+		{
+			throw new exception('STORAGE_FILE_EXISTS', $path);
+		}
 
 		try
 		{
@@ -133,6 +131,11 @@ class local implements adapter_interface, stream_interface
 	 */
 	public function get_contents($path)
 	{
+		if (!$this->exists($path))
+		{
+			throw new exception('STORAGE_FILE_NO_EXIST', $path);
+		}
+
 		$content = @file_get_contents($this->root_path . $this->get_path($path) . $this->get_filename($path));
 
 		if ($content === false)
@@ -246,20 +249,17 @@ class local implements adapter_interface, stream_interface
 	 */
 	protected function remove_empty_dirs($path)
 	{
-		if ($this->subfolders)
-		{
-			$dirpath = dirname($this->root_path . $path);
-			$filepath = dirname($this->root_path . $this->get_path($path) . $this->get_filename($path));
-			$path = filesystem_helper::make_path_relative($filepath, $dirpath);
+		$dirpath = dirname($this->root_path . $path);
+		$filepath = dirname($this->root_path . $this->get_path($path) . $this->get_filename($path));
+		$path = filesystem_helper::make_path_relative($filepath, $dirpath);
 
-			do
-			{
-				$parts = explode('/', $path);
-				$parts = array_slice($parts, 0, -1);
-				$path = implode('/', $parts);
-			}
-			while ($path && @rmdir($dirpath . '/' . $path));
+		do
+		{
+			$parts = explode('/', $path);
+			$parts = array_slice($parts, 0, -1);
+			$path = implode('/', $parts);
 		}
+		while ($path && @rmdir($dirpath . '/' . $path));
 	}
 
 	/**
@@ -271,22 +271,21 @@ class local implements adapter_interface, stream_interface
 	protected function get_path($path)
 	{
 		$dirname = dirname($path);
-		$dirname = ($dirname != '.') ? $dirname . DIRECTORY_SEPARATOR : '';
 
-		if ($this->subfolders)
+		$hash = md5(basename($path));
+
+		$parts = str_split($hash, 2);
+		$parts = array_slice($parts, 0, $this->dir_depth);
+
+		// Create path
+		$path = $dirname . DIRECTORY_SEPARATOR;
+
+		if (!empty($parts))
 		{
-			$hash = md5(basename($path));
-
-			$parts = str_split($hash, 2);
-			$parts = array_slice($parts, 0, $this->dir_depth);
-
-			if (!empty($parts))
-			{
-				$dirname .= implode(DIRECTORY_SEPARATOR, $parts) . DIRECTORY_SEPARATOR;
-			}
+			$path .= implode(DIRECTORY_SEPARATOR, $parts) . DIRECTORY_SEPARATOR;
 		}
 
-		return $dirname;
+		return $path;
 	}
 
 	/**
@@ -321,6 +320,11 @@ class local implements adapter_interface, stream_interface
 	{
 		$this->ensure_directory_exists($path);
 
+		if ($this->exists($path))
+		{
+			throw new exception('STORAGE_FILE_EXISTS', $path);
+		}
+
 		$stream = @fopen($this->root_path . $this->get_path($path) . $this->get_filename($path), 'w+b');
 
 		if (!$stream)
@@ -333,12 +337,10 @@ class local implements adapter_interface, stream_interface
 			fclose($stream);
 			throw new exception('STORAGE_CANNOT_COPY_RESOURCE');
 		}
-
-		fclose($stream);
 	}
 
 	/**
-	 * Get file size
+	 * Get file size.
 	 *
 	 * @param string	$path	The file
 	 *
@@ -348,7 +350,7 @@ class local implements adapter_interface, stream_interface
 	 */
 	public function file_size($path)
 	{
-		$size = @filesize($this->root_path . $this->get_path($path) . $this->get_filename($path));
+		$size = filesize($this->root_path . $this->get_path($path) . $this->get_filename($path));
 
 		if ($size === null)
 		{
@@ -359,7 +361,7 @@ class local implements adapter_interface, stream_interface
 	}
 
 	/**
-	 * Get file mimetype
+	 * Get file mimetype.
 	 *
 	 * @param string	$path	The file
 	 *
@@ -371,7 +373,7 @@ class local implements adapter_interface, stream_interface
 	}
 
 	/**
-	 * Get image dimensions
+	 * Get image dimensions.
 	 *
 	 * @param string	$path	The file
 	 *
@@ -392,7 +394,7 @@ class local implements adapter_interface, stream_interface
 	}
 
 	/**
-	 * Get image width
+	 * Get image width.
 	 *
 	 * @param string	$path	The file
 	 *
@@ -404,7 +406,7 @@ class local implements adapter_interface, stream_interface
 	}
 
 	/**
-	 * Get image height
+	 * Get image height.
 	 *
 	 * @param string	$path	The file
 	 *
@@ -420,21 +422,6 @@ class local implements adapter_interface, stream_interface
 	 */
 	public function get_link($path)
 	{
-		return generate_board_url() . '/' . $this->path . $path;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function free_space()
-	{
-		$free_space = @disk_free_space($this->root_path);
-
-		if ($free_space === false)
-		{
-			throw new exception('STORAGE_CANNOT_GET_FREE_SPACE');
-		}
-
-		return $free_space;
+		return generate_board_url() . $this->path . $path;
 	}
 }

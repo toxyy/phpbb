@@ -23,12 +23,13 @@ interface adapter_interface
 	public function configure($options);
 
 	/**
-	 * Dumps content into a file
+	 * Dumps content into a file.
 	 *
 	 * @param string	path		The file to be written to.
 	 * @param string	content		The data to write into the file.
 	 *
-	 * @throws \phpbb\storage\exception\exception		When the file cannot be written
+	 * @throws \phpbb\storage\exception\exception		When the file already exists
+	 * 													When the file cannot be written
 	 */
 	public function put_contents($path, $content);
 
@@ -37,7 +38,8 @@ interface adapter_interface
 	 *
 	 * @param string	$path	The file to read
 	 *
-	 * @throws \phpbb\storage\exception\exception	When cannot read file contents
+	 * @throws \phpbb\storage\exception\exception	When the file doesn't exist
+	 * 													When cannot read file contents
 	 *
 	 * @return string	Returns file contents
 	 *
@@ -45,7 +47,7 @@ interface adapter_interface
 	public function get_contents($path);
 
 	/**
-	 * Checks the existence of files or directories
+	 * Checks the existence of files or directories.
 	 *
 	 * @param string	$path	file/directory to check
 	 *
@@ -54,7 +56,7 @@ interface adapter_interface
 	public function exists($path);
 
 	/**
-	 * Removes files or directories
+	 * Removes files or directories.
 	 *
 	 * @param string	$path	file/directory to remove
 	 *
@@ -63,27 +65,29 @@ interface adapter_interface
 	public function delete($path);
 
 	/**
-	 * Rename a file or a directory
+	 * Rename a file or a directory.
 	 *
 	 * @param string	$path_orig	The original file/direcotry
 	 * @param string	$path_dest	The target file/directory
 	 *
-	 * @throws \phpbb\storage\exception\exception		When file/directory cannot be renamed
+	 * @throws \phpbb\storage\exception\exception		When target exists
+	 * 													When file/directory cannot be renamed
 	 */
 	public function rename($path_orig, $path_dest);
 
 	/**
-	 * Copies a file
+	 * Copies a file.
 	 *
 	 * @param string	$path_orig	The original filename
 	 * @param string	$path_dest	The target filename
 	 *
-	 * @throws \phpbb\storage\exception\exception		When the file cannot be copied
+	 * @throws \phpbb\storage\exception\exception		When target exists
+	 * 													When the file cannot be copied
 	 */
 	public function copy($path_orig, $path_dest);
 
 	/**
-	 * Get direct link
+	 * Get direct link.
 	 *
 	 * @param string	$path	The file
 	 *
@@ -91,13 +95,4 @@ interface adapter_interface
 	 *
 	 */
 	public function get_link($path);
-
-	/*
-	 * Get space available in bytes
-	 *
-	 * @throws \phpbb\storage\exception\exception		When unable to retrieve available storage space
-	 *
-	 * @return float	Returns available space
-	 */
-	public function free_space();
 }

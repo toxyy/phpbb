@@ -51,11 +51,10 @@ abstract class memory extends \phpbb\cache\driver\base
 	function load()
 	{
 		// grab the global cache
-		$data = $this->_read('global');
+		$this->vars = $this->_read('global');
 
-		if ($data !== false)
+		if ($this->vars !== false)
 		{
-			$this->vars = $data;
 			return true;
 		}
 
